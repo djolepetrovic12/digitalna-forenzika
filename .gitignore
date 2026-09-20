@@ -1,0 +1,28 @@
+# Python
+evtx-forensics-tool/.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Node
+node_modules/
+dist/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment/config secrets
+.env
+.env.*
+
+# IDE
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# EVTX evidence
+*.evtx
