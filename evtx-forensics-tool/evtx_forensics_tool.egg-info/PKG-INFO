@@ -1,0 +1,17 @@
+Metadata-Version: 2.4
+Name: evtx-forensics-tool
+Version: 0.1.0
+Summary: Windows Event Log forensic analyzer
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: python-evtx>=0.8.0
+Requires-Dist: fastapi>=0.115.0
+Requires-Dist: pydantic>=2.7.0
+Requires-Dist: pytest>=8.0.0
+
+# Windows Event Log Forensic Analyzer
+
+Software tool for forensic analysis and reconstruction of security-relevant
+activities from Windows Event Log (.evtx) files.
+
+Master's project — University of Niš, Faculty of Electronic Engineering.

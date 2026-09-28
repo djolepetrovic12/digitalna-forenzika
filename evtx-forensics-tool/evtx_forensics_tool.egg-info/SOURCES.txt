@@ -1,0 +1,17 @@
+README.md
+pyproject.toml
+backend/__init__.py
+backend/app/__init__.py
+backend/app/config/event_registry.py
+backend/app/evtx/extractors.py
+backend/app/evtx/normalizer.py
+backend/app/evtx/reader.py
+backend/app/models/domain.py
+backend/scripts/inspect_event.py
+backend/scripts/inspect_evtx.py
+backend/tests/unit/test_normalization.py
+evtx_forensics_tool.egg-info/PKG-INFO
+evtx_forensics_tool.egg-info/SOURCES.txt
+evtx_forensics_tool.egg-info/dependency_links.txt
+evtx_forensics_tool.egg-info/requires.txt
+evtx_forensics_tool.egg-info/top_level.txt
