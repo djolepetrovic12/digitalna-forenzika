@@ -29,9 +29,8 @@ export function ImportPage({ report, onReport, onClear }: ImportPageProps) {
   }
 
   return (
-    <section className="import-panel">
+    <section className={`import-panel ${report ? 'has-report' : ''}`}>
       <div className="import-copy">
-        <p className="eyebrow">Case evidence</p>
         <h2>Import EVTX evidence</h2>
         <p>Select one or more files to analyze together. Results remain in memory for this session.</p>
         <label className="file-button">

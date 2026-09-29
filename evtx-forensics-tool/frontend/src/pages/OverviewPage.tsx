@@ -1,30 +1,15 @@
 import React from 'react';
 import { EvtxAnalysisReport } from '../api/analysis';
+import { ImportPage } from './ImportPage';
 
 interface OverviewPageProps {
-  report: EvtxAnalysisReport | null;
+  report: EvtxAnalysisReport;
+  onReport: (report: EvtxAnalysisReport) => void;
+  onClear: () => void;
 }
 
-export function OverviewPage({ report }: OverviewPageProps) {
-  if (!report) {
-    return (
-      <section className="empty-state">
-        <p className="eyebrow">Ready for evidence</p>
-        <h2>Upload an EVTX file to begin</h2>
-        <p>Analysis is held in memory and is discarded when you clear it or reload the app.</p>
-      </section>
-    );
-  }
-
+export function OverviewPage({ report, onReport, onClear }: OverviewPageProps) {
   return (
-    <div>
-      <p className="eyebrow">Latest analysis</p>
-      <h2>{report.filename}</h2>
-      <div className="grid">
-        <section className="card"><span className="metric-label">Events</span><strong className="metric">{report.record_count}</strong></section>
-        <section className="card"><span className="metric-label">Findings</span><strong className="metric">{report.findings.length}</strong></section>
-        <section className="card"><span className="metric-label">Sessions</span><strong className="metric">{report.sessions.length}</strong></section>
-      </div>
-    </div>
+    <ImportPage report={report} onReport={onReport} onClear={onClear} />
   );
 }

@@ -6,10 +6,9 @@ import { SessionsPage } from './pages/SessionsPage';
 import { ImportPage } from './pages/ImportPage';
 import { TimelinePage } from './pages/TimelinePage';
 
-type View = 'overview' | 'timeline' | 'findings' | 'sessions' | 'import';
+type View = 'overview' | 'timeline' | 'findings' | 'sessions';
 
 const navigation: Array<{ id: View; label: string }> = [
-  { id: 'import', label: 'Import EVTX' },
   { id: 'overview', label: 'Overview' },
   { id: 'timeline', label: 'Timeline' },
   { id: 'findings', label: 'Findings' },
@@ -17,8 +16,16 @@ const navigation: Array<{ id: View; label: string }> = [
 ];
 
 export function App() {
-  const [view, setView] = React.useState<View>('import');
+  const [view, setView] = React.useState<View>('overview');
   const [report, setReport] = React.useState<EvtxAnalysisReport | null>(null);
+
+  if (!report) {
+    return (
+      <main className="app app-import-only">
+        <ImportPage report={null} onReport={setReport} onClear={() => setReport(null)} />
+      </main>
+    );
+  }
 
   return (
     <main className="app">
@@ -42,11 +49,10 @@ export function App() {
         ))}
       </nav>
 
-      {view === 'import' && <ImportPage report={report} onReport={(nextReport) => { setReport(nextReport); setView('overview'); }} onClear={() => setReport(null)} />}
-      {view === 'overview' && <OverviewPage report={report} />}
-      {view === 'timeline' && <TimelinePage events={report?.events ?? []} />}
-      {view === 'findings' && <FindingsPage findings={report?.findings ?? []} events={report?.events ?? []} />}
-      {view === 'sessions' && <SessionsPage sessions={report?.sessions ?? []} events={report?.events ?? []} />}
+      {view === 'overview' && <OverviewPage report={report} onReport={setReport} onClear={() => setReport(null)} />}
+      {view === 'timeline' && <TimelinePage events={report.events} />}
+      {view === 'findings' && <FindingsPage findings={report.findings} events={report.events} />}
+      {view === 'sessions' && <SessionsPage sessions={report.sessions} events={report.events} />}
     </main>
   );
 }
