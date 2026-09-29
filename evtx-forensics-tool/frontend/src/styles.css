@@ -235,6 +235,17 @@ button {
   overflow: auto;
 }
 
+.evidence-list {
+  max-height: 240px;
+  padding-right: 4px;
+}
+
+.evidence-detail {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
 .timeline-row {
   display: grid;
   grid-template-columns: 150px 1fr;

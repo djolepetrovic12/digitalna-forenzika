@@ -1,4 +1,5 @@
 import React from 'react';
+import { EventDetail } from '../components/events/EventDetail';
 import { EventRecord } from '../types/event';
 
 interface TimelinePageProps { events: EventRecord[] }
@@ -27,24 +28,7 @@ export function TimelinePage({ events }: TimelinePageProps) {
       </div>
       </section>
       <aside className="event-detail card">
-        {selectedEvent ? (
-          <>
-            <p className="eyebrow">Event detail</p>
-            <h2>{selectedEvent.title ?? 'Unknown event'}</h2>
-            <dl className="detail-grid">
-              <dt>Event ID</dt><dd>{selectedEvent.event_id ?? 'N/A'}</dd>
-              <dt>Record ID</dt><dd>{selectedEvent.record_id ?? 'N/A'}</dd>
-              <dt>Timestamp</dt><dd>{selectedEvent.timestamp_utc ?? 'N/A'}</dd>
-              <dt>Provider</dt><dd>{selectedEvent.provider ?? 'N/A'}</dd>
-              <dt>Channel</dt><dd>{selectedEvent.channel ?? 'N/A'}</dd>
-              <dt>Computer</dt><dd>{selectedEvent.computer ?? 'N/A'}</dd>
-            </dl>
-            <h3>Extracted attributes</h3>
-            <pre className="code-block">{JSON.stringify(selectedEvent.attributes ?? {}, null, 2)}</pre>
-            <h3>Raw XML</h3>
-            <pre className="code-block raw-xml">{selectedEvent.raw_xml ?? 'No raw XML available'}</pre>
-          </>
-        ) : <p>Select an event to inspect its normalized fields and raw XML.</p>}
+        <EventDetail event={selectedEvent} />
       </aside>
     </div>
   );
