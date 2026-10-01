@@ -1,0 +1,7 @@
+cd C:\D\DF\digitalna-forenzika\evtx-forensics-tool
+.\.venv\Scripts\Activate.ps1
+python -m uvicorn backend.app.main:app --reload
+
+
+cd C:\D\DF\digitalna-forenzika\evtx-forensics-tool\frontend
+npm run dev

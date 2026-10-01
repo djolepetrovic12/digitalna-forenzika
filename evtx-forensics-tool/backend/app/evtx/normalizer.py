@@ -8,6 +8,17 @@ from backend.app.evtx.extractors import extract_generic_fields
 from backend.app.models.domain import NormalizedEvent
 
 
+def _normalize_optional_text(value: Any) -> str | None:
+    if value is None:
+        return None
+    cleaned = str(value).strip()
+    if not cleaned or cleaned in {"-", "None", "null", "NULL"}:
+        return None
+    if cleaned.upper() == "S-1-0-0":
+        return None
+    return cleaned
+
+
 LOGON_TYPE_MAP = {
     2: "Interactive",
     3: "Network",
@@ -62,6 +73,10 @@ def normalize_event(xml_text: str, *, source_filename: str | None = None, record
     if isinstance(provider_node, dict):
         provider = provider_node.get("Name")
 
+    correlation = system.get("Correlation") or {}
+    activity_id = _normalize_optional_text(correlation.get("ActivityID"))
+    related_activity_id = _normalize_optional_text(correlation.get("RelatedActivityID"))
+
     if system.get("EventID") is not None:
         try:
             event_id = int(str(system["EventID"]))
@@ -84,19 +99,19 @@ def normalize_event(xml_text: str, *, source_filename: str | None = None, record
 
     definition = resolve_event_definition(provider, channel, event_id, version)
 
-    target_user = event_data.get("TargetUserName") or event_data.get("TargetUser") or event_data.get("MemberName")
-    target_domain = event_data.get("TargetDomainName") or event_data.get("TargetDomain")
-    target_sid = event_data.get("TargetUserSid") or event_data.get("TargetSid") or event_data.get("MemberSid")
-    subject_user = event_data.get("SubjectUserName")
-    subject_domain = event_data.get("SubjectDomainName")
-    subject_sid = event_data.get("SubjectUserSid") or event_data.get("SubjectSid")
-    logon_id = event_data.get("TargetLogonId") or event_data.get("SubjectLogonId") or event_data.get("LogonId")
-    source_ip = event_data.get("IpAddress") or event_data.get("ClientAddress")
-    src_host = event_data.get("WorkstationName") or event_data.get("Workstation")
-    status = event_data.get("Status")
-    sub_status = event_data.get("SubStatus")
-    group_name = event_data.get("GroupName")
-    group_sid = event_data.get("GroupSid") or event_data.get("GroupDomain")
+    target_user = _normalize_optional_text(event_data.get("TargetUserName") or event_data.get("TargetUser") or event_data.get("MemberName"))
+    target_domain = _normalize_optional_text(event_data.get("TargetDomainName") or event_data.get("TargetDomain"))
+    target_sid = _normalize_optional_text(event_data.get("TargetUserSid") or event_data.get("TargetSid") or event_data.get("MemberSid"))
+    subject_user = _normalize_optional_text(event_data.get("SubjectUserName"))
+    subject_domain = _normalize_optional_text(event_data.get("SubjectDomainName"))
+    subject_sid = _normalize_optional_text(event_data.get("SubjectUserSid") or event_data.get("SubjectSid"))
+    logon_id = _normalize_optional_text(str(event_data.get("TargetLogonId") or event_data.get("SubjectLogonId") or event_data.get("LogonId")))
+    source_ip = _normalize_optional_text(event_data.get("IpAddress") or event_data.get("ClientAddress"))
+    src_host = _normalize_optional_text(event_data.get("WorkstationName") or event_data.get("Workstation"))
+    status = _normalize_optional_text(event_data.get("Status"))
+    sub_status = _normalize_optional_text(event_data.get("SubStatus"))
+    group_name = _normalize_optional_text(event_data.get("GroupName"))
+    group_sid = _normalize_optional_text(event_data.get("GroupSid") or event_data.get("GroupDomain"))
 
     logon_type, logon_type_name = normalize_logon_type(event_data.get("LogonType"))
 
@@ -128,6 +143,8 @@ def normalize_event(xml_text: str, *, source_filename: str | None = None, record
         sub_status=sub_status,
         group_name=group_name,
         group_sid=group_sid,
+        activity_id=activity_id,
+        related_activity_id=related_activity_id,
         attributes={**event_data, **user_data},
         raw_xml=xml_text,
     )

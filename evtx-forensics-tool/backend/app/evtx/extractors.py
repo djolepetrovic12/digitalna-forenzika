@@ -13,6 +13,10 @@ def extract_system_fields(root: ET.Element) -> dict[str, Any]:
     if provider_node is not None:
         data["Provider"] = {"Name": provider_node.attrib.get("Name")}
 
+    correlation_node = system.find("{*}Correlation")
+    if correlation_node is not None:
+        data["Correlation"] = {k: v for k, v in correlation_node.attrib.items() if v is not None}
+
     for field in ("EventID", "Version", "Computer", "Level", "Channel", "EventRecordID"):
         node = system.find(f"{{*}}{field}")
         if node is not None:

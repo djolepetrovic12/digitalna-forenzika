@@ -1,16 +1,24 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from backend.app.models.domain import Finding, NormalizedEvent
 
-SYSTEM_EVENTS = {12, 13, 41, 1074, 6005, 6006, 6008}
+SYSTEM_EVENT_KEYS: set[tuple[str, int]] = {
+    ("Microsoft-Windows-Kernel-General", 12),
+    ("Microsoft-Windows-Kernel-General", 13),
+    ("Microsoft-Windows-Kernel-Power", 41),
+    ("USER32", 1074),
+    ("EventLog", 6005),
+    ("EventLog", 6006),
+    ("EventLog", 6008),
+}
 
 
 def reconstruct_system_activity(events: list[NormalizedEvent]) -> list[Finding]:
     grouped: dict[str | None, list[NormalizedEvent]] = {}
     for event in events:
-        if event.event_id in SYSTEM_EVENTS:
+        if (event.provider, event.event_id) in SYSTEM_EVENT_KEYS:
             grouped.setdefault(event.computer, []).append(event)
 
     findings: list[Finding] = []
@@ -19,7 +27,7 @@ def reconstruct_system_activity(events: list[NormalizedEvent]) -> list[Finding]:
         if not ordered:
             continue
         evidence_ids = [event.id or str(event.record_id) for event in ordered]
-        unexpected = any(event.event_id in {41, 6008} for event in ordered)
+        unexpected = any((event.provider, event.event_id) in {("Microsoft-Windows-Kernel-Power", 41), ("EventLog", 6008)} for event in ordered)
         findings.append(
             Finding(
                 id=f"system-{computer}-{ordered[0].id or ordered[0].record_id}",
@@ -34,7 +42,7 @@ def reconstruct_system_activity(events: list[NormalizedEvent]) -> list[Finding]:
                 end_time=ordered[-1].timestamp_utc,
                 correlation_type="direct",
                 confidence="HIGH" if unexpected else "MEDIUM",
-                metadata={"matched_fields": ["computer", "chronological relationship"], "event_ids": [event.event_id for event in ordered]},
+                metadata={"matched_fields": ["computer", "provider", "event_id", "chronological relationship"], "event_ids": [event.event_id for event in ordered]},
                 evidence_event_ids=evidence_ids,
             )
         )
@@ -42,7 +50,7 @@ def reconstruct_system_activity(events: list[NormalizedEvent]) -> list[Finding]:
 
 
 def attach_shutdown_context(findings: list[Finding], sessions: list, events: list[NormalizedEvent]) -> list[Finding]:
-    shutdowns = [event for event in events if event.event_id in {41, 6008}]
+    shutdowns = [event for event in events if (event.provider, event.event_id) in {("Microsoft-Windows-Kernel-Power", 41), ("EventLog", 6008)}]
     if not shutdowns:
         return findings
     for session in sessions:

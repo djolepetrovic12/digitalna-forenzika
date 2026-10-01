@@ -32,6 +32,8 @@ class NormalizedEvent:
     source_host: str | None = None
     status: str | None = None
     sub_status: str | None = None
+    activity_id: str | None = None
+    related_activity_id: str | None = None
     group_name: str | None = None
     group_sid: str | None = None
     attributes: dict[str, Any] = field(default_factory=dict)
@@ -83,9 +85,3 @@ class CorrelationEvidence:
     confidence: str = "MEDIUM"
 
 
-@dataclass
-class AuthenticationRuleConfig:
-    failed_attempt_threshold: int = 5
-    failed_attempt_window_minutes: int = 5
-    success_match_window_minutes: int = 10
-    privileged_group_window_minutes: int = 15
